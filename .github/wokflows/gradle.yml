@@ -1,0 +1,65 @@
+name: Rutube Auto Tests CI (Gradle)
+
+on:
+  push:
+    branches: [ "main", "master", "feedback" ]
+  pull_request:
+    branches: [ "main", "master", "feedback" ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Rutube Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Chrome
+        run: |
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Create results directories
+        run: mkdir -p test-results/screenshots test-results/html
+
+      - name: Run tests
+        run: ./gradlew test --tests "com.rutube.tests.RutubeScenario2Test" --no-daemon
+        env:
+          CI: true
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: test-results/screenshots/
+          retention-days: 30
+
+      - name: Upload HTML pages
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-pages
+          path: test-results/html/
+          retention-days: 30
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: build/reports/tests/test/
+          retention-days: 14
