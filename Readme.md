@@ -1,3 +1,5 @@
+[![VK Video Auto Tests CI](https://github.com/Kirill-Kazantcev/VideoChecker/actions/workflows/gradle.yml/badge.svg)](https://github.com/Kirill-Kazantcev/VideoChecker/actions/workflows/gradle.yml)
+
 ## Лабораторная работа 5 (2.3) - Автоматизация тестирования VK Видео
 
 ### Цель работы
